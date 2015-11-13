@@ -20,7 +20,7 @@
 (define (print-random-location)
   (define x (random 10))
   (define y (random 10))
-  (struct posn (x y)) ; this is a struct (data type) defined inside a function
+  (struct posn (x y) #:transparent) ; this is a struct (data type) defined inside a function
   (define a-random-position (posn x y))
   (printf "the generated random position: ~a,~a\n"
           (posn-x a-random-position)(posn-y a-random-position))
