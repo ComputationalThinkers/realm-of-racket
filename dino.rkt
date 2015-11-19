@@ -1,5 +1,11 @@
 #lang racket
 
+(require 2htdp/image 2htdp/universe)
+
+;; constants
+(define SCREEN-WIDTH 500)
+(define SCREEN-HEIGHT 200)
+
 ;; data structure of the dino game
 ;; cactuses is a list of posn where the cactus is currently
 (struct screen (dino cactuses))
@@ -64,6 +70,46 @@
   )
 
 ;; rendering
-(define render-screen screen)
+(define (render-screen screen)
+  (dino+scene (screen-dino screen)
+              (cactus-list+scene (screen-cactuses screen) MT-SCENE))
+  )
+
+(define (dino+scene dino scene)
+  (img+scene dino DINO-IMG scene)
+  )
+
+(define (img+scene posn img scene)
+  (place-image img
+               (* (posn-x posn) SEG-SIZE)
+               (* (posn-y posn) SEG-SIZE)
+               scene)
+  )
+
+(define (cactus-list+scene cactuses scene)
+  (define (get-posns-from-cactus cactuses)
+    (cond [(empty? cactuses) empty]
+          [else (cons (cactus-loc (first cactuses)) (get-posns-from-cactus (rest cactuses)))])
+    )
+  (img-list+scene (get-posns-from-cactus cactuses) CACTUS-IMG scene)
+  )
+
+(define (img-list+scene posns img scene)
+  (cond [(empty? posns) scene]
+        [else (img+scene (first posns) img (img-list+scene (rest posns) img scene))])
+  )
+
+;; end game
+(define (dead? screen)
+  #f
+  )
+
+(define (render-end screen)
+  (overlay (text "Game Over" ENDGAME-TEXT-SIZE "black")
+           (render-screen screen))
+  )
+
+;; start the game
+(start-dino-game)
 
   
